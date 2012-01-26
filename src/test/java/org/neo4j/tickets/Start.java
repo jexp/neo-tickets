@@ -16,7 +16,7 @@ public class Start {
 		if (webPort == null || webPort.isEmpty()) {
 		    webPort = "8080";
 		}
-		connector.setPort(webPort);
+		connector.setPort(Integer.valueOf(webPort));
 		server.setConnectors(new Connector[] { connector });
 
 		WebAppContext bb = new WebAppContext();
