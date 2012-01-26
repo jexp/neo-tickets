@@ -13,6 +13,10 @@
 			<id>wiquery</id>
 			<url>http://wiquery.googlecode.com/svn/repo</url>
 		</repository>
+		<repository>
+			<id>neo4j</id>
+			<url>http://m2.neo4j.org/releases</url>
+		</repository>
 	</repositories>
 	
 	<dependencies>
@@ -35,6 +39,11 @@
 			<artifactId>slf4j-api</artifactId>
 			<version>${slf4j.version}</version>
 		</dependency>
+        <dependency>
+            <groupId>org.neo4j</groupId>
+            <artifactId>neo4j-rest-graphdb</artifactId>
+            <version>1.6</version>
+        </dependency>
 		<dependency>
 			<groupId>org.slf4j</groupId>
 			<artifactId>slf4j-log4j12</artifactId>

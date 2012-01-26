@@ -4,7 +4,15 @@ import org.apache.wicket.PageParameters;
 import org.apache.wicket.ajax.AjaxRequestTarget;
 import org.apache.wicket.markup.html.WebPage;
 import org.apache.wicket.markup.html.basic.Label;
+import org.apache.wicket.markup.html.form.Button;
+import org.apache.wicket.markup.html.form.Form;
+import org.apache.wicket.markup.html.form.TextField;
 import org.apache.wicket.markup.html.panel.FeedbackPanel;
+import org.apache.wicket.model.CompoundPropertyModel;
+import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Relationship;
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.rest.graphdb.RestGraphDatabase;
 import org.odlabs.wiquery.core.events.Event;
 import org.odlabs.wiquery.core.events.MouseEvent;
 import org.odlabs.wiquery.core.events.WiQueryAjaxEventBehavior;
@@ -20,42 +28,27 @@ public class HomePage extends WebPage {
 
 	private static final long serialVersionUID = 1L;
 	
-	private int counter = 0;
+    private String name;
 	
     public HomePage(final PageParameters parameters) {
-    	
-    	final FeedbackPanel feedbackPanel = new FeedbackPanel("feedback");
-    	feedbackPanel.setOutputMarkupId(true);
-    	add(feedbackPanel);
-    	
-    	Label l = new Label("label", "click me");
-    	l.add(new WiQueryEventBehavior(new Event(MouseEvent.CLICK) {
-			private static final long serialVersionUID = 1L;
+    	Form form = new Form("form", new CompoundPropertyModel(this));
+        add(form);
+        form.add(new TextField("name"));
+       
+        form.add(new Button("submit") {
+            @Override
+            public void onSubmit() {
+                super.onSubmit();
+                final RestGraphDatabase gdb = ((WicketApplication) getApplication()).getGraphDatabase();
+                final Node node = gdb.createNode();
+                node.setProperty("name",name);
+                final Relationship rel = node.createRelationshipTo(gdb.getReferenceNode(), Types.IS_TICKET);
+                rel.setProperty("created",System.currentTimeMillis());
+            }
+        });
+    }
 
-			@Override
-			public JsScope callback() {
-				return JsScope.quickScope("alert('click me was clicked');");
-			}
-		}));
-    	
-    	add(l);
-    	
-    	Label l2 = new Label("ajaxlabel", "ajax click me");
-    	l2.add(new WiQueryAjaxEventBehavior(MouseEvent.CLICK){
-			private static final long serialVersionUID = 1L;
-
-			@Override
-			protected void onEvent(AjaxRequestTarget target) {
-				info("wiQuery ajax click event: " + counter++);
-				target.addComponent(feedbackPanel);
-			}
-    		
-    	});
-    	
-    	add(l2);
-    	
-    	//add tabs, select the second tab
-    	add(new Tabs("tabs").setDefaultSelectedTabIndex(1));
-        
+    enum Types implements RelationshipType{
+        IS_TICKET
     }
 }
